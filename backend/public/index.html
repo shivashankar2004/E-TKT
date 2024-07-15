@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Travel Cost</title>
+    <script>
+        async function getCost() {
+            const location1 = document.getElementById('location1').value;
+            const location2 = document.getElementById('location2').value;
+
+            // Check if both locations are provided
+            if (!location1 || !location2) {
+                alert('Please provide both location1 and location2');
+                return;
+            }
+
+            // Construct the URL for the API endpoint
+            const url = `http://localhost:3000/get_cost?location1=${encodeURIComponent(location1)}&location2=${encodeURIComponent(location2)}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                // Update UI with the cost
+                document.getElementById('result').textContent = `Cost from ${data.location1} to ${data.location2}: $${data.cost}`;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                alert('Error fetching data. Please try again later.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Get Travel Cost</h2>
+    <form>
+        <label for="location1">Location 1:</label>
+        <input type="text" id="location1" name="location1"><br><br>
+        <label for="location2">Location 2:</label>
+        <input type="text" id="location2" name="location2"><br><br>
+        <button type="button" onclick="getCost()">Get Cost</button>
+    </form>
+    <br>
+    <div id="result"></div>
+</body>
+</html>
