@@ -1,25 +1,28 @@
+class MultiKeyHashMap {
+    constructor() {
+        this.data = {};
+    }
 
-const data = {};
+    // Helper function to create a composite key
+    createKey(location1, location2) {
+        return `${location1}_${location2}`;
+    }
 
 
-function createKey(location1, location2) {
-    return `${location1}_${location2}`;
+    setAmount(location1, location2, amount) {
+        const key = this.createKey(location1, location2);
+        this.data[key] = amount;
+    }
+
+    getAmount(location1, location2) {
+        const key = this.createKey(location1, location2);
+        return this.data[key];
+    }
 }
 
-function setAmount(location1, location2, amount) {
-    const key = createKey(location1, location2);
-    data[key] = amount;
-}
+const travelCosts = new MultiKeyHashMap();
+travelCosts.setAmount("hopes", "singanallur", 10);
+travelCosts.setAmount("gandhipuram", "peelamedu", 20);
 
-function getAmount(location1, location2) {
-    const key = createKey(location1, location2);
-    return data[key];
-}
+module.exports=travelCosts
 
-
-setAmount("peel", "nava", 5);
-setAmount("psg", "gandhi", 13);
-
-
-module.exports={loc:data}
-; // { NewYork_LosAngeles: 500, SanFrancisco_Seattle: 300 }
