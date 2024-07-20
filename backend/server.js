@@ -4,21 +4,10 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 const port = 3000;
+const db=require("./database")
 
-const database=module.exports=()=>{
-    const connectionParams={
-        useNewUrlParser:true,
-        useUnifiedTopology:true,
-    }
-    try{
-        mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0',connectionParams)
-        console.log("sdb connected");
-    }catch(error){
-        console.log(error)
-        console.log("db connection failed")
-    }
-}
-database()
+db();
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -26,6 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/get_cost', (req, res) => {
     const location1 = req.query.location1;
     const location2 = req.query.location2;
+    
 
     if (!location1 || !location2) {
         return res.status(400).json({ error: 'Please provide both location1 and location2' });
