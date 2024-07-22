@@ -1,14 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser'); 
 const User = require('C:/Users/MK/Desktop/SPD/E-TKT/backend/models/userModel.js');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const JWT_SECRET = crypto.randomBytes(32).toString('base64');
+app.use(cookieParser());
+const JWT_SECRET = "spd";
 
 const database = async () => {
     try {
@@ -22,41 +23,35 @@ const database = async () => {
     }
 };
 
-
 database();
 
-
-const athuenticateToken = (req, res, next) => {
-    const authHead = req.headers['authorization'];
-    const token = authHead && authHead.split(' ')[1];
-    if (token == null) {
-        return res.status(401).json({
-            message: "token is null"
-        })
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.token
+    if (!token) {
+        return res.status(401).json({ message: "Token is null" });
     }
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            return res.status(403);
+            return res.status(403).json({ message: "Invalid token" });
         }
-        res.user = user;
+        req.user = user;
+        
         next();
-    })
-}
+
+    });
+};
 
 app.post('/register', async (req, res) => {
     try {
         const { name, password, ticket } = req.body;
 
-
         const existingUser = await User.findOne({ name });
         if (existingUser) {
-            console.log(existingUser);
             return res.status(400).json({ error: "The User Name is Taken" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const data = await User.create({ name, password: hashedPassword, ticket });
-        console.log('User Created:', data);
         return res.status(201).json(data);
 
     } catch (err) {
@@ -65,49 +60,89 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.get('/login', async (req, res) => {
+app.post('/login',async (req, res) => {
     try {
         const { name, password } = req.body;
 
         const member = await User.findOne({ name });
-        if (member) {
-
-            const isMatch = await bcrypt.compare(password, member.password);
-            if (isMatch) {
-                const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' })
-                return res.status(201).json({
-                    Message: "Logged in to " + member.name
-                });
-            } else {
-                return res.status(400).json({
-                    Message: "Invalid Password"
-                });
+        const check = req.cookies.token;
+        if(check){
+            jwt.verify(check, JWT_SECRET, (err, user) => {
+                if (err) {
+                    return res.status(403).json({ message: "Invalid token" });
+                }
+                req.user = user;
+            })
+            if(name === req.user.name){
+            return res.json({
+                message : name+" is already logged in"
+            })}
+            else{
+                return res.json({
+                    message : "Logout "+req.user.name+" before logging into "+name
+                }) 
             }
-        } else {
+        }
+        if (!member) {
             return res.status(404).json({
-                Message: "No User Named " + name
+                message: "No User Named " + name
             });
         }
+
+        const isMatch = await bcrypt.compare(password, member.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Invalid Password"
+            });
+        }
+
+        const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', accessToken, { 
+            httpOnly: true, 
+            secure: true, 
+            maxAge: 3600000 
+        }); 
+        return res.status(200).json({
+            message: "Logged in too " + member.name,
+            token: accessToken
+        });
+
+
     } catch (error) {
         console.error("Error handling /login route:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-
-app.put('/book', athuenticateToken, async (req, res) => {
+app.put('/book', authenticateToken, async (req, res) => {
     try {
-        const { name } = res.user;
+        const { name } = req.user;
         const { ticket } = req.body;
 
-        const update = await User.findOneAndUpdate({ name }, { ticket }, { new: true })
+        const update = await User.findOne({ name });
+        console.log(update);
+
         if (!update) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        return res.status(200).json(update);
+        if(update.ticket === ticket){
+            return res.status(200).json({
+                message:"The ticket is alreadybooked"
+            })
+        }
+        else{
+            update.ticket = ticket;
+            const upuser = await update.save();
+            return res.status(200).json(upuser);
+        }
+
     } catch (err) {
-        console.error("Error handling /update route:", err);
+        console.error("Error handling /book route:", err);
         res.status(500).json({ error: err.message });
     }
-})  
+});
+app.post('/logout', authenticateToken, async (req, res) => {
+    res.clearCookie('token', { httpOnly: true, secure: true });
+    return res.status(200).json({ message: "Logged out "+req.user.name+"successfully" });
+});
