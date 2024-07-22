@@ -23,22 +23,17 @@ app.get('/get_cost', async (req, res) => {
     }
 
     try {
-        const averageCost = 30;
-        const cost = averageCost + 4;
+        const locationCost = await LocationCost.findOne({ location1, location2 });
 
-        const newLocationCost = new LocationCost({
-            location1,
-            location2,
-            cost: cost.toFixed(2)
-        });
-
-        await newLocationCost.save();
-
-        res.json({
-            location1,
-            location2,
-            cost: cost.toFixed(2)
-        });
+        if (locationCost) {
+            res.json({
+                location1,
+                location2,
+                cost: locationCost.cost
+            });
+        } else {
+            res.status(404).json({ error: 'Cost not found for the provided locations' });
+        }
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
