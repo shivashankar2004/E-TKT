@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const User = require('C:/Users/MK/Desktop/SPD/E-TKT/backend/models/userModel.js');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+const JWT_SECRET = crypto.randomBytes(32).toString('base64');
 
 const database = async () => {
     try {
@@ -23,9 +25,27 @@ const database = async () => {
 
 database();
 
+
+const athuenticateToken = (req, res, next) => {
+    const authHead = req.headers['authorization'];
+    const token = authHead && authHead.split(' ')[1];
+    if (token == null) {
+        return res.status(401).json({
+            message: "token is null"
+        })
+    }
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403);
+        }
+        res.user = user;
+        next();
+    })
+}
+
 app.post('/register', async (req, res) => {
     try {
-        const { name, password } = req.body;
+        const { name, password, ticket } = req.body;
 
 
         const existingUser = await User.findOne({ name });
@@ -35,7 +55,7 @@ app.post('/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const data = await User.create({ name, password: hashedPassword });
+        const data = await User.create({ name, password: hashedPassword, ticket });
         console.log('User Created:', data);
         return res.status(201).json(data);
 
@@ -54,6 +74,7 @@ app.get('/login', async (req, res) => {
 
             const isMatch = await bcrypt.compare(password, member.password);
             if (isMatch) {
+                const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' })
                 return res.status(201).json({
                     Message: "Logged in to " + member.name
                 });
@@ -72,3 +93,21 @@ app.get('/login', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+app.put('/book', athuenticateToken, async (req, res) => {
+    try {
+        const { name } = res.user;
+        const { ticket } = req.body;
+
+        const update = await User.findOneAndUpdate({ name }, { ticket }, { new: true })
+        if (!update) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.status(200).json(update);
+    } catch (err) {
+        console.error("Error handling /update route:", err);
+        res.status(500).json({ error: err.message });
+    }
+})  
