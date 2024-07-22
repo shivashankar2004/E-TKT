@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser'); 
 const User = require('C:/Users/MK/Desktop/SPD/E-TKT/backend/models/userModel.js');
@@ -10,7 +9,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-const JWT_SECRET = "mk";
+const JWT_SECRET = "spd";
 
 const database = async () => {
     try {
@@ -27,8 +26,7 @@ const database = async () => {
 database();
 
 const authenticateToken = (req, res, next) => {
-    console.log(req.cookies);
-    const token = req.cookies.token;
+    const token = req.cookies.token
     if (!token) {
         return res.status(401).json({ message: "Token is null" });
     }
@@ -37,7 +35,9 @@ const authenticateToken = (req, res, next) => {
             return res.status(403).json({ message: "Invalid token" });
         }
         req.user = user;
+        
         next();
+
     });
 };
 
@@ -60,11 +60,29 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login',async (req, res) => {
     try {
         const { name, password } = req.body;
 
         const member = await User.findOne({ name });
+        const check = req.cookies.token;
+        if(check){
+            jwt.verify(check, JWT_SECRET, (err, user) => {
+                if (err) {
+                    return res.status(403).json({ message: "Invalid token" });
+                }
+                req.user = user;
+            })
+            if(name === req.user.name){
+            return res.json({
+                message : name+" is already logged in"
+            })}
+            else{
+                return res.json({
+                    message : "Logout "+req.user.name+" before logging into "+name
+                }) 
+            }
+        }
         if (!member) {
             return res.status(404).json({
                 message: "No User Named " + name
@@ -79,7 +97,11 @@ app.post('/login', async (req, res) => {
         }
 
         const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' });
-        res.cookie('token', accessToken, { httpOnly: true, secure: true, maxAge: 3600000 }); // 1 hour expiry
+        res.cookie('token', accessToken, { 
+            httpOnly: true, 
+            secure: true, 
+            maxAge: 3600000 
+        }); 
         return res.status(200).json({
             message: "Logged in too " + member.name,
             token: accessToken
@@ -97,18 +119,30 @@ app.put('/book', authenticateToken, async (req, res) => {
         const { name } = req.user;
         const { ticket } = req.body;
 
-        const update = await User.findOneAndUpdate({ name }, { ticket }, { new: true });
+        const update = await User.findOne({ name });
+        console.log(update);
+
         if (!update) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        return res.status(200).json(update);
+        if(update.ticket === ticket){
+            return res.status(200).json({
+                message:"The ticket is alreadybooked"
+            })
+        }
+        else{
+            update.ticket = ticket;
+            const upuser = await update.save();
+            return res.status(200).json(upuser);
+        }
+
     } catch (err) {
         console.error("Error handling /book route:", err);
         res.status(500).json({ error: err.message });
     }
 });
-app.post('/logout', authenticateToken, (req, res) => {
+app.post('/logout', authenticateToken, async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
-    return res.status(200).json({ message: "Logged out successfully" });
+    return res.status(200).json({ message: "Logged out "+req.user.name+"successfully" });
 });
