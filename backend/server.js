@@ -5,15 +5,15 @@ const path = require('path');
 const connectDB = require('./database');
 const LocationCost = require('./models/Locationcost');
 
-const app = express();
-const port = 3000;
+    const app = express();
+    const port = 3000;
 
-connectDB();
+    connectDB();
 
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+    app.use(cors());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
+    app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/get_cost', async (req, res) => {
     const { location1, location2 } = req.query;
