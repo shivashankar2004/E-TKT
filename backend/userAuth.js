@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');   
 const cookieParser = require('cookie-parser'); 
-const User = require('C:/Users/MK/Desktop/SPD/E-TKT/backend/models/userModel.js');
+const User = require('./models/userModel.js');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
