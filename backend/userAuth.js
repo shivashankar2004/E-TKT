@@ -1,15 +1,24 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');   
-const cookieParser = require('cookie-parser'); 
+const bcrypt = require('bcrypt');
+const cors = require('cors');
+const path = require('path');
+const LocationCost = require('./models/Locationcost');
+const cookieParser = require('cookie-parser');
 const User = require('./models/userModel.js');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 const JWT_SECRET = "spd";
+
+
+
+
 
 const database = async () => {
     try {
@@ -28,14 +37,14 @@ database();
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token
     if (!token) {
-        return res.status(401).json({ message: "Token is null" });
+        return res.status(401).json({ message: "Log in before booking" });
     }
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({ message: "Invalid token" });
         }
         req.user = user;
-        
+
         next();
 
     });
@@ -60,27 +69,28 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post('/login',async (req, res) => {
+app.post('/login', async (req, res) => {
     try {
         const { name, password } = req.body;
 
         const member = await User.findOne({ name });
         const check = req.cookies.token;
-        if(check){
+        if (check) {
             jwt.verify(check, JWT_SECRET, (err, user) => {
                 if (err) {
                     return res.status(403).json({ message: "Invalid token" });
                 }
                 req.user = user;
             })
-            if(name === req.user.name){
-            return res.json({
-                message : name+" is already logged in"
-            })}
-            else{
+            if (name === req.user.name) {
                 return res.json({
-                    message : "Logout "+req.user.name+" before logging into "+name
-                }) 
+                    message: name + " is already logged in"
+                })
+            }
+            else {
+                return res.json({
+                    message: "Logout " + req.user.name + " before logging into " + name
+                })
             }
         }
         if (!member) {
@@ -97,11 +107,11 @@ app.post('/login',async (req, res) => {
         }
 
         const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' });
-        res.cookie('token', accessToken, { 
-            httpOnly: true, 
-            secure: true, 
-            maxAge: 3600000 
-        }); 
+        res.cookie('token', accessToken, {
+            httpOnly: true,
+            secure: true,
+            maxAge: 3600000
+        });
         return res.status(200).json({
             message: "Logged in too " + member.name,
             token: accessToken
@@ -117,32 +127,36 @@ app.post('/login',async (req, res) => {
 app.put('/book', authenticateToken, async (req, res) => {
     try {
         const { name } = req.user;
-        const { ticket } = req.body;
-
         const update = await User.findOne({ name });
-        console.log(update);
-
         if (!update) {
             return res.status(404).json({ error: "User not found" });
         }
-
-        if(update.ticket === ticket){
-            return res.status(200).json({
-                message:"The ticket is alreadybooked"
-            })
+        const { location1, location2 } = req.body;
+        if (!location1 || !location2) {
+            return res.status(400).json({ error: 'Please provide both location1 and location2' });
         }
-        else{
-            update.ticket = ticket;
+        const locationCost = await LocationCost.findOne({ location1, location2 });
+        if (locationCost) {
+            update.ticket = {
+                loc1:locationCost.location1,
+                loc2:locationCost.location2,
+                cost:locationCost.cost
+            };
             const upuser = await update.save();
+
             return res.status(200).json(upuser);
+
+        } else {
+            res.status(404).json({ error: 'Cost not found for the provided locations' });
         }
 
-    } catch (err) {
+    }
+    catch (err) {
         console.error("Error handling /book route:", err);
         res.status(500).json({ error: err.message });
     }
 });
 app.post('/logout', authenticateToken, async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
-    return res.status(200).json({ message: "Logged out "+req.user.name+"successfully" });
+    return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
 });
