@@ -61,7 +61,8 @@ app.post('/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const data = await User.create({ name, password: hashedPassword, ticket });
-        return res.status(201).json(data);
+        console.log( res.status(201).json(data));
+        
 
     } catch (err) {
         console.error("Error handling /register route:", err);
