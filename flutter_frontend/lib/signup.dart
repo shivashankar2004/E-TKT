@@ -6,7 +6,6 @@ import 'dart:convert';
 
 class SignupPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -63,20 +62,6 @@ class SignupPage extends StatelessWidget {
         ),
         SizedBox(height: 10),
         TextField(
-          controller: _emailController,
-          decoration: InputDecoration(
-            hintText: "Email",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: BorderSide.none,
-            ),
-            fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            filled: true,
-            prefixIcon: Icon(Icons.email),
-          ),
-        ),
-        SizedBox(height: 10),
-        TextField(
           controller: _passwordController,
           decoration: InputDecoration(
             hintText: "Password",
@@ -94,45 +79,67 @@ class SignupPage extends StatelessWidget {
       ],
     );
   }
+Widget _signupButton(BuildContext context) {
+  return ElevatedButton(
+        
 
-  Widget _signupButton(BuildContext context) {
-    return ElevatedButton(
       onPressed: () async {
-        var response = await _registerUser(
-          _usernameController.text,
-          _emailController.text,
-          _passwordController.text,
+      var response = await _registerUser(
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      if (response.statusCode == 201) {
+        // Show success message
+        final successSnackBar = SnackBar(
+          content: Text('Registration successful!'),
+          backgroundColor: Colors.green,
+          
         );
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
-        if (response.statusCode == 201) {
-          Navigator.pushNamed(context, '/pref1');
-        } else {
-          final snackBar =
-              SnackBar(content: Text('Failed to register: ${response.body}'));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      },
-      child: Text(
-        "Sign Up",
-        style: TextStyle(fontSize: 20),
-      ),
-      style: ElevatedButton.styleFrom(
-        shape: StadiumBorder(),
-        padding: EdgeInsets.symmetric(vertical: 16),
-      ),
-    );
-  }
+        // Navigate to the next screen after a delay
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushNamed(context, '/login');
+        });
+      } else {
+        // Show error message
+        final errorSnackBar = SnackBar(
+          content: Text('Failed to register: ${response.body}'),
+          backgroundColor: Colors.red,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
+      }
+    },
+    child: Text(
+      "Sign Up",
+      style: TextStyle(fontSize: 20),
+    ),
+    style: ElevatedButton.styleFrom(
+      shape: StadiumBorder(),
+      padding: EdgeInsets.symmetric(vertical: 16),
+      minimumSize: Size(150, 56),
 
-  Future<http.Response> _registerUser(
-      String name, String email, String password) {
+    ),
+  );
+}
+
+
+  Future<http.Response> _registerUser(String name, String password) {
     return http.post(
-      Uri.parse('http://localhost:5000/register'),
+      Uri.parse('http://192.168.60.176:5000/register'),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/json',
       },
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, dynamic>{
         'name': name,
-        'password': password, // replace with actual ticket value
+        'password': password,
+        'ticket': {
+          'loc1': '',
+          'loc2': '',
+          'cost': 0,
+          'issueDate': DateTime.now().toIso8601String(), // Format the date correctly
+        },
       }),
     );
   }

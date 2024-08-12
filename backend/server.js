@@ -53,22 +53,28 @@ const authenticateToken = (req, res, next) => {
 app.post('/register', async (req, res) => {
     try {
         const { name, password, ticket } = req.body;
-
         const existingUser = await User.findOne({ name });
         if (existingUser) {
             return res.status(400).json({ error: "The User Name is Taken" });
         }
 
+     
         const hashedPassword = await bcrypt.hash(password, 10);
-        const data = await User.create({ name, password: hashedPassword, ticket });
-        console.log( res.status(201).json(data));
-        
 
+        
+        const newUser = await User.create({ name, password: hashedPassword, ticket });
+
+        
+        console.log(newUser);
+
+        res.status(201).json(newUser);
+        
     } catch (err) {
         console.error("Error handling /register route:", err);
         res.status(500).json({ error: err.message });
     }
 });
+
 
 app.post('/login', async (req, res) => {
     try {
