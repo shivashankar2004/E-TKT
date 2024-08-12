@@ -126,7 +126,7 @@ class SignupPage extends StatelessWidget {
   Future<http.Response> _registerUser(
       String name, String email, String password) {
     return http.post(
-      Uri.parse('http://yourserver:5000/register'),
+      Uri.parse('http://localhost:5000/register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
