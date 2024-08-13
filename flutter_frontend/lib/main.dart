@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
+import 'package:flutter_frontend/dummy.dart';
+
 
 void main() async {
   runApp(const MyApp());
@@ -22,6 +24,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => LoginPage(),
           '/signup': (context) => SignupPage(),
+          '/dummy': (context) => MyHomePage(),
           /*'/pref1':(context) => Preference1(),
         '/pref2':(context) => Preference2(),
         '/mainpage':(context) => MainMusicPage(),
