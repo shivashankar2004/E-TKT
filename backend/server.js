@@ -163,6 +163,32 @@ app.put('/book', authenticateToken, async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+app.get('/ticket', authenticateToken, async (req, res) => {
+    try {
+        const { name } = req.user;
+        const user = await User.findOne({ name });
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        if (user.ticket && user.ticket.loc1 && user.ticket.loc2) {
+            return res.status(200).json({ 
+                message: "Ticket found", 
+                ticket: user.ticket 
+            });
+        } else {
+            return res.status(404).json({ error: "No ticket found for the user" });
+        }
+    } catch (err) {
+        console.error("Error handling /ticket route:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
 app.post('/logout', authenticateToken, async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
