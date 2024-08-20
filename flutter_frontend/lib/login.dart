@@ -76,7 +76,8 @@ class LoginPage extends StatelessWidget {
               _passwordController.text,
             );
 
-            if (response.statusCode == 200) { // Changed to 200, typically used for successful login
+            if (response.statusCode == 200) {
+              // Changed to 200, typically used for successful login
               // Show success message
               final successSnackBar = SnackBar(
                 content: Text('Login successful!'),
@@ -86,7 +87,8 @@ class LoginPage extends StatelessWidget {
 
               // Navigate to the next screen after a delay
               Future.delayed(Duration(seconds: 2), () {
-                Navigator.pushNamed(context, '/dummy'); // Assume you navigate to home after login
+                Navigator.pushNamed(context,
+                    '/dummy'); // Assume you navigate to home after login
               });
             } else {
               // Show error message
@@ -131,7 +133,7 @@ class LoginPage extends StatelessWidget {
   Future<http.Response> _loginUser(String name, String password) {
     // The body of the request must be properly formatted as JSON
     return http.post(
-      Uri.parse('http://192.168.60.176:5000/login'),
+      Uri.parse('http://192.168.62.176:3000/login'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
