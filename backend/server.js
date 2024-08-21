@@ -18,14 +18,14 @@ const JWT_SECRET = "spd";
 
 
 
-
+const port = 3000;
 
 const database = async () => {
     try {
         await mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0');
         console.log("Connected to Cloud");
-        app.listen(5000, () => {
-            console.log('Server is listening on port 5000');
+        app.listen(port,() => {
+            console.log('Server is listening on port '+port);
         });
     } catch (error) {
         console.error("DB connection failed:", error);
@@ -66,7 +66,7 @@ app.post('/register', async (req, res) => {
 
         
         console.log(newUser);
-
+        
         res.status(201).json(newUser);
         
     } catch (err) {
