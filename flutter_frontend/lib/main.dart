@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => LoginPage(),
           '/signup': (context) => SignupPage(),
-          '/dummy': (context) => MyHomePage(),
+    
           /*'/pref1':(context) => Preference1(),
         '/pref2':(context) => Preference2(),
         '/mainpage':(context) => MainMusicPage(),
