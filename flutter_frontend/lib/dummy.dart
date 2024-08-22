@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
+class MyHomePage extends StatefulWidget {
+  final token;
+  const MyHomePage({@required this.token, Key? key}) : super(key: key);
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
-class MyHomePage extends StatelessWidget {
+class _MyHomePageState extends State<MyHomePage> {
+  late String name;
+  void initState() {
+    super.initState();
+
+    Map<String, dynamic> jsondecodetoken = JwtDecoder.decode(widget.token);
+    name = jsondecodetoken['name'];
+  }
+
   Future<Position> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -23,7 +39,7 @@ class MyHomePage extends StatelessWidget {
         return Future.error('Location permissions are denied');
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, show an error
       return Future.error(
@@ -45,24 +61,13 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Enter Your Current Location!',
+              'Hello '+name+'!!',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                try {
-                  Position position = await _getCurrentLocation();
-                  // Use the latitude and longitude here
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'Latitude: ${position.latitude}, Longitude: ${position.longitude}'),
-                  ));
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Error: $e'),
-                  ));
-                }
+              onPressed: () {
+                _handleLocationRequest();
               },
               child: Text('Click Me'),
             ),
@@ -70,5 +75,20 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleLocationRequest() async {
+    try {
+      Position position = await _getCurrentLocation();
+      // Use the latitude and longitude here
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Latitude: ${position.latitude}, Longitude: ${position.longitude}'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+      ));
+    }
   }
 }

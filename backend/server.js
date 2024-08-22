@@ -81,25 +81,7 @@ app.post('/login', async (req, res) => {
         const { name, password } = req.body;
 
         const member = await User.findOne({ name });
-        const check = req.cookies.token;
-        if (check) {
-            jwt.verify(check, JWT_SECRET, (err, user) => {
-                if (err) {
-                    return res.status(403).json({ message: "Invalid token" });
-                }
-                req.user = user;
-            })
-            if (name === req.user.name) {
-                return res.json({
-                    message: name + " is already logged in"
-                })
-            }
-            else {
-                return res.json({
-                    message: "Logout " + req.user.name + " before logging into " + name
-                })
-            }
-        }
+
         if (!member) {
             return res.status(404).json({
                 message: "No User Named " + name
@@ -114,13 +96,14 @@ app.post('/login', async (req, res) => {
         }
 
         const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' });
-        res.cookie('token', accessToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 3600000
-        });
+
+
+
+        console.log(accessToken);
+        
+        
         return res.status(200).json({
-            message: "Logged in too " + member.name,
+            status : true,
             token: accessToken
         });
 
@@ -166,4 +149,9 @@ app.put('/book', authenticateToken, async (req, res) => {
 app.post('/logout', authenticateToken, async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
+});
+
+app.get('/test',authenticateToken,async(req,res) =>{
+    const {name} = req.user.name;
+    console.log(name);
 });
