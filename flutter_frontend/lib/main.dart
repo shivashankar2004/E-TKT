@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
-import 'package:flutter_frontend/dummy.dart';
 
 
 void main() async {

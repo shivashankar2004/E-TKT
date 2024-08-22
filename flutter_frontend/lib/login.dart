@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          margin: EdgeInsets.all(24),
+          margin: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _header(context) {
-    return Column(
+    return const Column(
       children: [
         Text("Welcome Back",
             style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
@@ -68,10 +68,10 @@ class _LoginPageState extends State<LoginPage> {
                 borderSide: BorderSide.none),
             fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
             filled: true,
-            prefixIcon: Icon(Icons.person),
+            prefixIcon: const Icon(Icons.person),
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         TextField(
           controller: _passwordController,
           decoration: InputDecoration(
@@ -81,11 +81,11 @@ class _LoginPageState extends State<LoginPage> {
                 borderSide: BorderSide.none),
             fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
             filled: true,
-            prefixIcon: Icon(Icons.lock),
+            prefixIcon: const Icon(Icons.lock),
           ),
           obscureText: true,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () {
             _loginUser(
@@ -93,13 +93,13 @@ class _LoginPageState extends State<LoginPage> {
               _passwordController.text,
             );
           },
-          child: Text(
+          child: const Text(
             "Login",
             style: TextStyle(fontSize: 20),
           ),
           style: ElevatedButton.styleFrom(
-            shape: StadiumBorder(),
-            padding: EdgeInsets.symmetric(vertical: 16),
+            shape: const StadiumBorder(),
+            padding: const EdgeInsets.symmetric(vertical: 16),
           ),
         ),
       ],
@@ -107,19 +107,19 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _forgotPassword(context) {
-    return TextButton(onPressed: () {}, child: Text("Forgot password?"));
+    return TextButton(onPressed: () {}, child: const Text("Forgot password?"));
   }
 
   Widget _signup(context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Don't have an account?"),
+        const Text("Don't have an account?"),
         TextButton(
             onPressed: () {
               Navigator.pushNamed(context, '/signup');
             },
-            child: Text("Sign Up"))
+            child: const Text("Sign Up"))
       ],
     );
   }
@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
         var mytoken = jsonres['token'];
         await prefs.setString('token', mytoken);
         
-        final successSnackBar = SnackBar(
+        const successSnackBar = SnackBar(
           content: Text('Login successful!'),
           backgroundColor: Colors.green,
         );
