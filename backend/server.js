@@ -99,7 +99,6 @@ app.post('/login', async (req, res) => {
 
 
 
-        console.log(accessToken);
         
         
         return res.status(200).json({
@@ -151,7 +150,12 @@ app.post('/logout', authenticateToken, async (req, res) => {
     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
 });
 
-app.get('/test',authenticateToken,async(req,res) =>{
-    const {name} = req.user.name;
-    console.log(name);
+app.post('/test',async(req,res) =>{
+    try{    
+    const {name , longitude} = req.body;
+    console.log(name,longitude);
+    }
+    catch(err){
+        console.log(err);
+    }
 });
