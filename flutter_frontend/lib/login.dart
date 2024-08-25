@@ -149,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('token', mytoken);
         
         const successSnackBar = SnackBar(
-          content: Text('Login successful!'),
+          content: Text('Login successful!'), 
           backgroundColor: Colors.green,
         );
         ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
