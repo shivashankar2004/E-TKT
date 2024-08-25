@@ -1,13 +1,14 @@
-import 'dart:convert';
-import 'dart:ui';
+// ignore_for_file: unnecessary_string_interpolations
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_frontend/locationdata.dart';
+import 'package:flutter_frontend/login.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // ignore: duplicate_import
 import 'locationdata.dart';
 
@@ -23,11 +24,17 @@ class _MyHomePageState extends State<MyHomePage> {
   String? selectedStop;
   String? StopeOne;
   bool isClicked = false;
+  bool isSelected = false;
+  late SharedPreferences prefs;
   void initState() {
     super.initState();
-
+    initSharedprefs();
     Map<String, dynamic> jsondecodetoken = JwtDecoder.decode(widget.token);
     name = jsondecodetoken['name'];
+  }
+
+  void initSharedprefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   Future<Position> _getCurrentLocation() async {
@@ -62,69 +69,115 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
- Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(title: Text('Home Page'), bottomOpacity: 2.0),
-    body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'Hello $name!!',
-            style: TextStyle(fontSize: 24),
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Home Page',
+            style:
+                GoogleFonts.roboto(fontSize: 24, fontStyle: FontStyle.normal),
           ),
-          SizedBox(height: 20),
-          if (!isClicked)
-            ElevatedButton(
-              onPressed: _handleLocationRequest,
-              child: Text('Click Me'),
-            ),
-          SizedBox(height: 20),
-          if (upcomingStops.isNotEmpty) ...[
-            SizedBox(height: 20),
-            Text(
-              'Upcoming Stops',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  Expanded(
+          elevation: 15.0,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LoginPage()));
+                },
+                icon: Icon(
+                  Icons.navigate_before_rounded,
+                  size: 35,
+                  color: Color.fromARGB(255, 95, 33, 230),
+                ))
+          ],
+        ),
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Hello ',
+                        style: GoogleFonts.roboto(
+                            fontSize: 24, color: Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      TextSpan(
+                          text: '$name!',
+                          style: GoogleFonts.robotoMono(
+                              fontSize: 24,
+                              color: Color.fromARGB(255, 95, 33, 230))),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                if (!isClicked)
+                  ElevatedButton(
+                    onPressed: _handleLocationRequest,
+                    child: Text('Click Me'),
+                  ),
+                SizedBox(height: 5),
+                if (upcomingStops.isNotEmpty) ...[
+                  Text('Select any of the Stops',
+                      style: GoogleFonts.robotoFlex(
+                          fontSize: 22, color: Colors.black)),
+                  SizedBox(height: 12),
+                  SizedBox(
+                    height: 7 * 56.0,
+                    // Assuming each ListTile is 56.0 height
                     child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: upcomingStops.length,
                       itemBuilder: (context, index) {
                         String stopName = upcomingStops[index];
-                        return ListTile(
-                          title: Text(stopName),
-                          tileColor: selectedStop == stopName
-                              ? Colors.blue.withOpacity(0.3)
-                              : null,
-                          onTap: () => _onStopTap(stopName),
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey, // Border color
+                              width: 1.0, // Border width
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            color: selectedStop == stopName
+                                ? Color.fromARGB(0, 102, 218, 226)
+                                    .withOpacity(0.5)
+                                : null, // Rounded corners
+                          ),
+                          margin: EdgeInsets.symmetric(
+                              vertical: 4.0,
+                              horizontal: 8.0), // Spacing around each item
+                          child: ListTile(
+                            title: Text(
+                              '• $stopName',
+                              style: GoogleFonts.roboto(
+                                fontSize: 19,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            onTap: () => _onStopTap(stopName),
+                          ),
                         );
                       },
                     ),
                   ),
-                  SizedBox(height: 2), // Space above the button
-                  if (selectedStop != null)
+
+                  SizedBox(height: 30), // Space above the button
+                  if (isClicked)
                     ElevatedButton(
-                      onPressed: () {
-                        // Implement booking functionality here
-                      },
-                      child: Text('Book'),
+                      onPressed: _clickBook,
+                      child: Text('Proceed to payment'),
                     ),
                 ],
-              ),
+              ],
             ),
-          ],
-        ],
-      ),
-    ),
-  );
-}
-
+          ),
+        ));
+  }
 
   void _handleLocationRequest() async {
     try {
@@ -144,9 +197,8 @@ class _MyHomePageState extends State<MyHomePage> {
       //   content: Text(
       //       'Latitude: ${position.latitude}, Longitude: ${position.longitude}'),
       // ));
-
-      _sendLoc(position.latitude, position.longitude);
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error: $e'),
       ));
@@ -156,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onStopTap(String stopName) {
     setState(() {
       selectedStop = stopName;
+      isSelected = true;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -165,11 +218,56 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<http.Response> _sendLoc(double lat, double long) async {
-    return await http.post(Uri.parse('http://192.168.62.176:3000/test'),
+  void _clickBook() async {
+    if (isSelected) {
+      _sendLoc(StopeOne, selectedStop);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please Select Your Destinaion"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _sendLoc(String? loc1, String? loc2) async {
+    print('Sending request to server...');
+    print('Location1: $loc1, Location2: $loc2');
+
+    var res = await http.post(Uri.parse('http://192.168.62.176:3000/test'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
-        body: jsonEncode(<String, dynamic>{'name': name, 'longitude': long}));
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'location1': loc1,
+          'location2': loc2
+        }));
+
+    print('Response status: ${res.statusCode}');
+    print('Response body: ${res.body}');
+
+    if (res.statusCode == 200) {
+      var jsonres = jsonDecode(res.body);
+      if (jsonres['status']) {
+        var cost = jsonres['cost'];
+        await prefs.setInt('cost', cost);
+        await prefs.setString('location1', loc1!);
+        await prefs.setString('location2', loc2!);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Cost fetched Successfully'),
+          backgroundColor: Colors.green,
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to fetch the Cost: ${jsonres['messsage']}'),
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to get the Cost: ${res.body}')),
+      );
+    }
   }
 }

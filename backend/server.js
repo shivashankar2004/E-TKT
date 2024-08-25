@@ -152,8 +152,17 @@ app.post('/logout', authenticateToken, async (req, res) => {
 
 app.post('/test',async(req,res) =>{
     try{    
-    const {name , longitude} = req.body;
-    console.log(name,longitude);
+    const {location1,location2} = req.body;
+
+        const locdet = await LocationCost.findOne({location1,location2});
+
+        return res.status(200).json(
+            {
+                status:true,
+                cost : locdet.cost
+            }
+        )
+    
     }
     catch(err){
         console.log(err);
