@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/landingpage.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: SignupPage(),
+        home: LandingPage(),
         routes: {
           '/login': (context) => LoginPage(),
           '/signup': (context) => SignupPage(),

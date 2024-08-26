@@ -12,7 +12,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   late SharedPreferences prefs;
 
   @override
@@ -93,13 +92,13 @@ class _LoginPageState extends State<LoginPage> {
               _passwordController.text,
             );
           },
-          child: const Text(
-            "Login",
-            style: TextStyle(fontSize: 20),
-          ),
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          child: const Text(
+            "Login",
+            style: TextStyle(fontSize: 20),
           ),
         ),
       ],
@@ -126,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginUser(String name, String password) async {
     var res = await http.post(
-      Uri.parse('http://192.168.62.176:3000/login'),
+      Uri.parse('http://192.168.37.176:5000/login'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },

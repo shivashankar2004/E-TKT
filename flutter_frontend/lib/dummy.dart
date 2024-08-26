@@ -232,10 +232,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _sendLoc(String? loc1, String? loc2) async {
-    print('Sending request to server...');
-    print('Location1: $loc1, Location2: $loc2');
-
-    var res = await http.post(Uri.parse('http://192.168.62.176:3000/test'),
+  
+   var res = await http.post(Uri.parse('http://192.168.37.176:5000/test'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
@@ -244,9 +242,6 @@ class _MyHomePageState extends State<MyHomePage> {
           'location1': loc1,
           'location2': loc2
         }));
-
-    print('Response status: ${res.statusCode}');
-    print('Response body: ${res.body}');
 
     if (res.statusCode == 200) {
       var jsonres = jsonDecode(res.body);
