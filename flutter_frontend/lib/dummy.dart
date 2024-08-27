@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/bookingPage.dart';
 import 'package:flutter_frontend/locationdata.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,11 +11,12 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: duplicate_import
+import 'config.dart';
 import 'locationdata.dart';
 
 class MyHomePage extends StatefulWidget {
   final token;
-  const MyHomePage({@required this.token, Key? key}) : super(key: key);
+  const MyHomePage({this.token, Key? key}) : super(key: key);
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -81,10 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
           elevation: 15.0,
           actions: [
             IconButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                },
+                onPressed: () {},
                 icon: Icon(
                   Icons.navigate_before_rounded,
                   size: 35,
@@ -232,8 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _sendLoc(String? loc1, String? loc2) async {
-  
-   var res = await http.post(Uri.parse('http://192.168.37.176:5000/test'),
+    var res = await http.post(Uri.parse('${url}test'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
@@ -254,6 +252,13 @@ class _MyHomePageState extends State<MyHomePage> {
           content: Text('Cost fetched Successfully'),
           backgroundColor: Colors.green,
         ));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  BookingPage(name: name, loc1: StopeOne, loc2: selectedStop)),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Failed to fetch the Cost: ${jsonres['messsage']}'),

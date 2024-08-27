@@ -1,5 +1,6 @@
 import 'dart:convert'; // Added for JSON encoding
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/config.dart';
 import 'package:flutter_frontend/dummy.dart'; // Assuming this is where MyHomePage is located
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -125,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginUser(String name, String password) async {
     var res = await http.post(
-      Uri.parse('http://192.168.37.176:5000/login'),
+      Uri.parse('${url}login'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
