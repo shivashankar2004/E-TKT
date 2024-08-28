@@ -1,20 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/dummy.dart';
+import 'package:flutter_frontend/config.dart';
+import 'package:flutter_frontend/currLoc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class BookingPage extends StatefulWidget {
-  final String name;
-  final String? loc1;
-  final String? loc2;
+  final token;
 
-  const BookingPage({Key? key, required this.name, required this.loc1, required this.loc2} ):super(key: key);
+  const BookingPage({Key? key, required this.token}) : super(key: key);
 
   _MyBookingPage createState() => _MyBookingPage();
 }
 
 class _MyBookingPage extends State<BookingPage> {
   late SharedPreferences prefs;
+  late String name;
+  late String? loc1;
+  late String? loc2;
+  late int cost;
 
   @override
   void initState() {
@@ -24,13 +30,34 @@ class _MyBookingPage extends State<BookingPage> {
 
   void initSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString('name')!;
+      loc1 = prefs.getString('location1')!;
+      loc2 = prefs.getString('location2')!;
+      cost = prefs.getInt('cost')!;
+    });
   }
 
-  void _bookNow() {
-    // Functionality for booking goes here
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Booking confirmed for ${widget.name}!')),
-    );
+  Future<void> _bookNow() async {
+    var res = await http.put(Uri.parse('${url}book'),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'location1': loc1,
+          'location2': loc2,
+          'cost':cost
+        }));
+
+    if (res.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking confirmed for ${name}!')),
+      );
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('error : ${res.statusCode}')),
+      );
+    }
   }
 
   @override
@@ -46,7 +73,12 @@ class _MyBookingPage extends State<BookingPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                            token: widget.token,
+                          )));
             },
             icon: Icon(
               Icons.navigate_before_rounded,
@@ -61,7 +93,7 @@ class _MyBookingPage extends State<BookingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${widget.name} is travelling from ${widget.loc1} to ${widget.loc2}',
+              'The Cost for is travelling from ${loc1} to ${loc2} is ${cost}',
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
@@ -70,7 +102,8 @@ class _MyBookingPage extends State<BookingPage> {
               onPressed: _bookNow,
               child: Text('Book Now'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 95, 33, 230), // Text color
+                foregroundColor: Colors.white,
+                backgroundColor: Color.fromARGB(255, 95, 33, 230), // Text color
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 textStyle: TextStyle(fontSize: 16),
               ),
