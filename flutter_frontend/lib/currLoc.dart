@@ -209,12 +209,6 @@ class _MyHomePageState extends State<MyHomePage> {
       selectedStop = stopName;
       isSelected = true;
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('You Journey is from $StopeOne to $selectedStop'),
-      ),
-    );
   }
 
   void _clickBook() async {
@@ -245,19 +239,15 @@ class _MyHomePageState extends State<MyHomePage> {
       var jsonres = jsonDecode(res.body);
       if (jsonres['status']) {
         var cost = jsonres['cost'];
+        await prefs.setString('name', name);
         await prefs.setInt('cost', cost);
         await prefs.setString('location1', loc1!);
         await prefs.setString('location2', loc2!);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Cost fetched Successfully'),
-          backgroundColor: Colors.green,
-        ));
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  BookingPage(name: name, loc1: StopeOne, loc2: selectedStop)),
+              builder: (context) => BookingPage(token: widget.token)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

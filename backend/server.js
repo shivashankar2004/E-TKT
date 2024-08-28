@@ -113,38 +113,36 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.put('/book', authenticateToken, async (req, res) => {
+app.put('/book', async (req, res) => {
     try {
-        const { name } = req.user;
-        const update = await User.findOne({ name });
-        if (!update) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        const { location1, location2 } = req.body;
-        if (!location1 || !location2) {
-            return res.status(400).json({ error: 'Please provide both location1 and location2' });
-        }
-        const locationCost = await LocationCost.findOne({ location1, location2 });
-        if (locationCost) {
-            update.ticket = {
-                loc1:locationCost.location1,
-                loc2:locationCost.location2,
-                cost:locationCost.cost
-            };
-            const upuser = await update.save();
+        const { location1, location2, cost, name } = req.body;
 
-            return res.status(200).json(upuser);
-
-        } else {
-            res.status(404).json({ error: 'Cost not found for the provided locations' });
+        if (!location1 || !location2 || !cost || !name) {
+            return res.status(400).json({ error: 'Please provide all required fields: location1, location2, cost, and name.' });
         }
 
-    }
-    catch (err) {
+        const user = await User.findOne({ name });
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        user.ticket = {
+            loc1: location1,
+            loc2: location2,
+            cost: cost
+        };
+
+        await user.save();
+
+
+        return res.status(200).json({ message: 'Ticket information updated successfully' });
+    } catch (err) {
         console.error("Error handling /book route:", err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 });
+
 app.post('/logout', authenticateToken, async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
