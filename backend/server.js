@@ -18,7 +18,7 @@ const JWT_SECRET = "spd";
 
 
 
-const port = 5000;
+const port = 7777;
 
 const database = async () => {
     try {
