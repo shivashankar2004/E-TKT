@@ -26,8 +26,8 @@ class LandingPage extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFA9F1DF), // Light turquoise (#A9F1DF)
-              Color(0xFFFFBBBB), // Light pink (#FFBBBB)
+              Color.fromARGB(255, 255, 255, 255), // Light turquoise (#A9F1DF)
+              Color.fromARGB(255, 255, 255, 255), // Light pink (#FFBBBB)
             ],
             stops: [0.2, 0.8],
           ),

@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide.none),
-            fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            fillColor: Theme. of(context).primaryColor.withOpacity(0.1),
             filled: true,
             prefixIcon: const Icon(Icons.person),
           ),
