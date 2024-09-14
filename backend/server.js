@@ -16,10 +16,6 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 const JWT_SECRET = "spd";
 
-
-
-
-
 const database = async () => {
     try {
         await mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0');
@@ -34,21 +30,7 @@ const database = async () => {
 
 database();
 
-const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token
-    if (!token) {
-        return res.status(401).json({ message: "Log in before booking" });
-    }
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Invalid token" });
-        }
-        req.user = user;
-
-        next();
-
-    });
-};
+// Removed authenticateToken middleware
 
 app.post('/register', async (req, res) => {
     try {
@@ -58,13 +40,10 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ error: "The User Name is Taken" });
         }
 
-     
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        
         const newUser = await User.create({ name, password: hashedPassword, ticket });
 
-        
         console.log(newUser);
 
         res.status(201).json(newUser);
@@ -74,7 +53,6 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 app.post('/login', async (req, res) => {
     try {
@@ -88,16 +66,15 @@ app.post('/login', async (req, res) => {
                     return res.status(403).json({ message: "Invalid token" });
                 }
                 req.user = user;
-            })
+            });
             if (name === req.user.name) {
                 return res.json({
                     message: name + " is already logged in"
-                })
-            }
-            else {
+                });
+            } else {
                 return res.json({
                     message: "Logout " + req.user.name + " before logging into " + name
-                })
+                });
             }
         }
         if (!member) {
@@ -120,10 +97,9 @@ app.post('/login', async (req, res) => {
             maxAge: 3600000
         });
         return res.status(200).json({
-            message: "Logged in too " + member.name,
+            message: "Logged in to " + member.name,
             token: accessToken
         });
-
 
     } catch (error) {
         console.error("Error handling /login route:", error);
@@ -131,9 +107,10 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.put('/book', authenticateToken, async (req, res) => {
+// Updated /book route to remove authentication
+app.put('/book', async (req, res) => {
     try {
-        const { name } = req.user;
+        const { name } = req.body;
         const update = await User.findOne({ name });
         if (!update) {
             return res.status(404).json({ error: "User not found" });
@@ -145,9 +122,9 @@ app.put('/book', authenticateToken, async (req, res) => {
         const locationCost = await LocationCost.findOne({ location1, location2 });
         if (locationCost) {
             update.ticket = {
-                loc1:locationCost.location1,
-                loc2:locationCost.location2,
-                cost:locationCost.cost
+                loc1: locationCost.location1,
+                loc2: locationCost.location2,
+                cost: locationCost.cost
             };
             const upuser = await update.save();
 
@@ -157,16 +134,16 @@ app.put('/book', authenticateToken, async (req, res) => {
             res.status(404).json({ error: 'Cost not found for the provided locations' });
         }
 
-    }
-    catch (err) {
+    } catch (err) {
         console.error("Error handling /book route:", err);
         res.status(500).json({ error: err.message });
     }
 });
 
-app.get('/ticket', authenticateToken, async (req, res) => {
+// Updated /ticket route to remove authentication
+app.get('/ticket', async (req, res) => {
     try {
-        const { name } = req.user;
+        const { name } = req.query;
         const user = await User.findOne({ name });
         
         if (!user) {
@@ -187,9 +164,8 @@ app.get('/ticket', authenticateToken, async (req, res) => {
     }
 });
 
-
-
-app.post('/logout', authenticateToken, async (req, res) => {
+// Updated /logout route to remove authentication
+app.post('/logout', async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
-    return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
+    return res.status(200).json({ message: "Logged out successfully" });
 });
