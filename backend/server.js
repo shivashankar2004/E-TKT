@@ -7,8 +7,9 @@ const path = require('path');
 const LocationCost = require('./models/Locationcost');
 const cookieParser = require('cookie-parser');
 const User = require('./models/userModel.js');
+const admin = require('./models/admin.js');
 
-const app = express();
+const app = express()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -141,16 +142,17 @@ app.put('/book', async (req, res) => {
 });
 
 // Updated /ticket route to remove authentication
-app.get('/ticket', async (req, res) => {
+
+// Updated /app.get('/ticket', async (req, res) => {
     try {
-        const { name } = req.query;
+        const { name } = req.body;
         const user = await User.findOne({ name });
         
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        if (user.ticket && user.ticket.loc1 && user.ticket.loc2) {
+        if (user) {
             return res.status(200).json({ 
                 message: "Ticket found", 
                 ticket: user.ticket 
@@ -162,9 +164,8 @@ app.get('/ticket', async (req, res) => {
         console.error("Error handling /ticket route:", err);
         res.status(500).json({ error: err.message });
     }
-});
-
-// Updated /logout route to remove authentication
+//});
+//logout route to remove authentication
 app.post('/logout', async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
     return res.status(200).json({ message: "Logged out successfully" });
