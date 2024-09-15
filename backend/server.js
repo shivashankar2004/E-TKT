@@ -18,7 +18,8 @@ const JWT_SECRET = "spd";
 
 
 
-const port = 7777;
+const port = 5555;
+
 
 const database = async () => {
     try {
@@ -34,21 +35,21 @@ const database = async () => {
 
 database();
 
-const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token
-    if (!token) {
-        return res.status(401).json({ message: "Log in before booking" });
-    }
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Invalid token" });
-        }
-        req.user = user;
+// const authenticateToken = (req, res, next) => {
+//     const token = req.cookies.token
+//     if (!token) {
+//         return res.status(401).json({ message: "Log in before booking" });
+//     }
+//     jwt.verify(token, JWT_SECRET, (err, user) => {
+//         if (err) {
+//             return res.status(403).json({ message: "Invalid token" });
+//         }
+//         req.user = user;
 
-        next();
+//         next();
 
-    });
-};
+//     });
+// };
 
 app.post('/register', async (req, res) => {
     try {
