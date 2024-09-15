@@ -18,7 +18,7 @@ const JWT_SECRET = "spd";
 
 
 
-const port = 7777;
+const port = 5555;
 const database = async () => {
     try {
         await mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0');

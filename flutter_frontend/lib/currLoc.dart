@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/bookingPage.dart';
 import 'package:flutter_frontend/locationdata.dart';
-import 'package:flutter_frontend/login.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +11,6 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: duplicate_import
 import 'config.dart';
-import 'locationdata.dart';
 
 class MyHomePage extends StatefulWidget {
   final token;
