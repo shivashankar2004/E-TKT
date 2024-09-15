@@ -19,6 +19,8 @@ const JWT_SECRET = "spd";
 
 
 const port = 5555;
+
+
 const database = async () => {
     try {
         await mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0');
@@ -142,12 +144,10 @@ app.put('/book', async (req, res) => {
     }
 });
 
-
-// app.post('/logout', authenticateToken, async (req, res) => {
-//     res.clearCookie('token', { httpOnly: true, secure: true });
-//     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
-// });
-
+app.post('/logout', authenticateToken, async (req, res) => {
+    res.clearCookie('token', { httpOnly: true, secure: true });
+    return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
+});
 
 app.post('/test',async(req,res) =>{
     try{    
@@ -167,5 +167,3 @@ app.post('/test',async(req,res) =>{
         console.log(err);
     }
 });
-
-
