@@ -7,8 +7,9 @@ const path = require('path');
 const LocationCost = require('./models/Locationcost');
 const cookieParser = require('cookie-parser');
 const User = require('./models/userModel.js');
+const Admin = require('./models/admin.js'); // Import admin model
 
-const app = express();
+const app = express()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -51,6 +52,7 @@ database();
 //     });
 // };
 
+// User Registration Route
 app.post('/register', async (req, res) => {
     try {
         const { name, password, ticket } = req.body;
@@ -59,13 +61,9 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ error: "The User Name is Taken" });
         }
 
-     
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        
         const newUser = await User.create({ name, password: hashedPassword, ticket });
 
-        
         console.log(newUser);
         
         res.status(201).json(newUser);
@@ -76,7 +74,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-
+// User Login Route
 app.post('/login', async (req, res) => {
     try {
         const { name, password } = req.body;
@@ -84,16 +82,12 @@ app.post('/login', async (req, res) => {
         const member = await User.findOne({ name });
 
         if (!member) {
-            return res.status(404).json({
-                message: "No User Named " + name
-            });
+            return res.status(404).json({ message: "No User Named " + name });
         }
 
         const isMatch = await bcrypt.compare(password, member.password);
         if (!isMatch) {
-            return res.status(400).json({
-                message: "Invalid Password"
-            });
+            return res.status(400).json({ message: "Invalid Password" });
         }
 
         const accessToken = jwt.sign({ name: member.name }, JWT_SECRET, { expiresIn: '1h' });
@@ -114,6 +108,74 @@ app.post('/login', async (req, res) => {
     }
 });
 
+
+app.post('/admin-register', async (req, res) => {
+    try {
+        const { name, password } = req.body;
+
+        // Check if admin with the same name already exists
+        const existingAdmin = await Admin.findOne({ name });
+        if (existingAdmin) {
+            return res.status(400).json({ error: "Admin name is already taken" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new admin
+        const newAdmin = await Admin.create({ name, password: hashedPassword });
+
+        console.log(newAdmin);
+        res.status(201).json(newAdmin);
+
+    } catch (err) {
+        console.error("Error handling /admin/register route:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// Admin Login Route
+app.post('/admin-login', async (req, res) => {
+    try {
+        const { name, password } = req.body;
+
+        const admin = await Admin.findOne({ name });
+        const check = req.cookies.token;
+        if (check) {
+            jwt.verify(check, JWT_SECRET, (err, adminData) => {
+                if (err) {
+                    return res.status(403).json({ message: "Invalid token" });
+                }
+                req.admin = adminData;
+            });
+            if (name === req.admin.name) {
+                return res.json({ message: name + " is already logged in as Admin" });
+            } else {
+                return res.json({ message: "Logout " + req.admin.name + " before logging into " + name });
+            }
+        }
+
+        if (!admin) {
+            return res.status(404).json({ message: "No Admin Named " + name });
+        }
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid Password" });
+        }
+
+        const accessToken = jwt.sign({ name: admin.name }, JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', accessToken, { httpOnly: true, secure: true, maxAge: 3600000 });
+        return res.status(200).json({ message: "Logged in as Admin " + admin.name, token: accessToken });
+
+    } catch (error) {
+        console.error("Error handling /admin-login route:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Book Ticket Route
 app.put('/book', async (req, res) => {
     try {
         const { location1, location2, cost, name } = req.body;
@@ -144,9 +206,24 @@ app.put('/book', async (req, res) => {
     }
 });
 
-app.post('/logout', async (req, res) => {
-    res.clearCookie('token', { httpOnly: true, secure: true });
-    return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
+
+app.post('/test',async(req,res) =>{
+    try{    
+    const {location1,location2} = req.body;
+
+        const locdet = await LocationCost.findOne({location1,location2});
+
+        return res.status(200).json(
+            {
+                status:true,
+                cost : locdet.cost
+            }
+        )
+    
+    }
+    catch(err){
+        console.log(err);
+    }
 });
 
 app.post('/test',async(req,res) =>{
