@@ -144,7 +144,7 @@ app.put('/book', async (req, res) => {
     }
 });
 
-app.post('/logout', authenticateToken, async (req, res) => {
+app.post('/logout', async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true });
     return res.status(200).json({ message: "Logged out " + req.user.name + "successfully" });
 });
