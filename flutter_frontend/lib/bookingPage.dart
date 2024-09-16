@@ -97,16 +97,16 @@ class _MyBookingPage extends State<BookingPage> {
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20), // Add some spacing between text and button
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _bookNow,
-              child: Text('Book Now'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Color.fromARGB(255, 95, 33, 230), // Text color
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 textStyle: TextStyle(fontSize: 16),
               ),
+              child: Text('Book Now'),
             ),
           ],
         ),
