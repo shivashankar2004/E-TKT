@@ -1,4 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages, use_super_parameters
 
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/landingpage.dart';

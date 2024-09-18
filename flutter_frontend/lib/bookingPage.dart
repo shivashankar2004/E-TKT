@@ -8,10 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class BookingPage extends StatefulWidget {
-  final token;
-
-  const BookingPage({Key? key, required this.token}) : super(key: key);
-
   _MyBookingPage createState() => _MyBookingPage();
 }
 
@@ -76,9 +72,7 @@ class _MyBookingPage extends State<BookingPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MyHomePage(
-                            token: widget.token,
-                          )));
+                      builder: (context) => MyHomePage()));
             },
             icon: Icon(
               Icons.navigate_before_rounded,
