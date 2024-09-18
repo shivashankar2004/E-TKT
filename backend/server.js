@@ -226,21 +226,39 @@ app.post('/test',async(req,res) =>{
     }
 });
 
-app.post('/test',async(req,res) =>{
-    try{    
-    const {location1,location2} = req.body;
+app.post('/ticket', async (req, res) => {
+    try {
+        const { name } = req.body;
+        
 
-        const locdet = await LocationCost.findOne({location1,location2});
+        // Find the user by name
+        const user = await User.findOne({ name });
 
-        return res.status(200).json(
-            {
-                status:true,
-                cost : locdet.cost
-            }
-        )
-    
-    }
-    catch(err){
-        console.log(err);
+        
+        if (!user) {
+            console.log("No User");
+        }
+
+        // Check if the user has a ticket and loc1 is not empty
+        if (user.ticket && user.ticket.loc1 !== "") {
+            return res.status(200).json({
+                status: true,
+                ticket: user.ticket
+            });
+        } else {
+            // If loc1 is empty, return 204 (No Content)
+            return res.status(204).json({
+                status: false,
+                message: 'No ticket available'
+            });
+        }
+    } catch (err) {
+        console.log(err.message);
+        // Return 500 (Internal Server Error) in case of any server-side error
+        return res.status(500).json({
+            status: false,
+            message: 'Server error'
+        });
     }
 });
+

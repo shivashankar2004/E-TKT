@@ -2,6 +2,8 @@ import 'dart:convert'; // Added for JSON encoding
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/config.dart';
 import 'package:flutter_frontend/currLoc.dart'; // Assuming this is where MyHomePage is located
+import 'package:flutter_frontend/home.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,7 +32,17 @@ class _LoginPageState extends State<LoginPage> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFcaf0f8), // Pale Blue
+                Color.fromARGB(255, 255, 255, 255), // Soft Blue
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -46,11 +58,23 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _header(context) {
-    return const Column(
+    return Column(
       children: [
-        Text("Welcome Back",
-            style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-        Text("Enter your credentials to login"),
+        Text(
+          "Welcome Back",
+          style: GoogleFonts.roboto(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF03045e), // Dark Navy
+          ),
+        ),
+        Text(
+          "Enter your credentials to login",
+          style: GoogleFonts.roboto(
+            fontSize: 18,
+            color: Color(0xFF0077b6), // Deep Blue
+          ),
+        ),
       ],
     );
   }
@@ -64,11 +88,12 @@ class _LoginPageState extends State<LoginPage> {
           decoration: InputDecoration(
             hintText: "Username",
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none),
-            fillColor: Theme. of(context).primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            fillColor: Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
             filled: true,
-            prefixIcon: const Icon(Icons.person),
+            prefixIcon: Icon(Icons.person, color: Color(0xFF0077b6)), // Deep Blue Icon
           ),
         ),
         const SizedBox(height: 10),
@@ -77,11 +102,12 @@ class _LoginPageState extends State<LoginPage> {
           decoration: InputDecoration(
             hintText: "Password",
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none),
-            fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            fillColor: Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
             filled: true,
-            prefixIcon: const Icon(Icons.lock),
+            prefixIcon: Icon(Icons.lock, color: Color(0xFF0077b6)), // Deep Blue Icon
           ),
           obscureText: true,
         ),
@@ -94,12 +120,16 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
           style: ElevatedButton.styleFrom(
-            shape: const StadiumBorder(),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: const StadiumBorder(), backgroundColor: Color(0xFF03045e),
+            padding: const EdgeInsets.symmetric(vertical: 16), // Dark Navy Button Background
           ),
-          child: const Text(
+          child: Text(
             "Login",
-            style: TextStyle(fontSize: 20),
+            style: GoogleFonts.robotoMono(
+              fontSize: 20,
+              color: Colors.white, // White Text Color
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -107,19 +137,38 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _forgotPassword(context) {
-    return TextButton(onPressed: () {}, child: const Text("Forgot password?"));
+    return TextButton(
+      onPressed: () {},
+      child: Text(
+        "Forgot password?",
+        style: GoogleFonts.roboto(
+          color: Color(0xFF03045e), // Dark Navy Text Color
+        ),
+      ),
+    );
   }
 
   Widget _signup(context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Don't have an account?"),
+        Text(
+          "Don't have an account?",
+          style: GoogleFonts.roboto(
+            color: Color(0xFF0077b6), // Deep Blue
+          ),
+        ),
         TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/signup');
-            },
-            child: const Text("Sign Up"))
+          onPressed: () {
+            Navigator.pushNamed(context, '/signup');
+          },
+          child: Text(
+            "Sign Up",
+            style: GoogleFonts.roboto(
+              color: Color(0xFF03045e), // Dark Navy Text Color
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -147,30 +196,29 @@ class _LoginPageState extends State<LoginPage> {
       if (jsonres['status']) {
         var mytoken = jsonres['token'];
         await prefs.setString('token', mytoken);
-        
         const successSnackBar = SnackBar(
-          content: Text('Login successful!'), 
-          backgroundColor: Colors.green,
+          content: Text('Login successful!'),
+          backgroundColor: Color(0xFF00b4d8), // Bright Blue
         );
         ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
-        
+
         // Navigate to the next page with the token
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => MyHomePage(token: mytoken)),
+              builder: (context) => HomePage()),
         );
       } else {
         final errorSnackBar = SnackBar(
           content: Text('Login failed: ${jsonres['message']}'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF0077b6), // Deep Blue
         );
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
       }
     } else {
       final errorSnackBar = SnackBar(
         content: Text('Failed to login: ${res.body}'),
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xFF0077b6), // Deep Blue
       );
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
     }

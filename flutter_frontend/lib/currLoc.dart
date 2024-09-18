@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/bookingPage.dart';
+import 'package:flutter_frontend/home.dart';
 import 'package:flutter_frontend/locationdata.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,8 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config.dart';
 
 class MyHomePage extends StatefulWidget {
-  final token;
-  const MyHomePage({this.token, Key? key}) : super(key: key);
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -26,15 +25,19 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isClicked = false;
   bool isSelected = false;
   late SharedPreferences prefs;
+  var token;
   void initState() {
     super.initState();
     initSharedprefs();
-    Map<String, dynamic> jsondecodetoken = JwtDecoder.decode(widget.token);
-    name = jsondecodetoken['name'];
   }
 
   void initSharedprefs() async {
     prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs.getString('token');
+      Map<String, dynamic> jsondecodetoken = JwtDecoder.decode(token);
+      name = jsondecodetoken['name'];
+    });
   }
 
   Future<Position> _getCurrentLocation() async {
@@ -74,14 +77,17 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Text(
-            'Home Page',
+            'Fetch Your Loaction',
             style:
                 GoogleFonts.roboto(fontSize: 24, fontStyle: FontStyle.normal),
           ),
           elevation: 15.0,
           actions: [
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomePage()));
+                },
                 icon: Icon(
                   Icons.navigate_before_rounded,
                   size: 35,
@@ -244,8 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => BookingPage(token: widget.token)),
+          MaterialPageRoute(builder: (context) => BookingPage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
