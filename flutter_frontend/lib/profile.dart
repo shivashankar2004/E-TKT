@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,8 +100,11 @@ class _ProfilePage extends State<ProfilePage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
-            onPressed: logout, // Logout action
+            icon: Icon(Icons.navigate_before_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomePage()));
+            }, // Logout action
           ),
         ],
         shape: RoundedRectangleBorder(
