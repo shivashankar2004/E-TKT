@@ -133,7 +133,7 @@ class AdminLoginPage extends StatelessWidget {
   Future<http.Response> _adminLogin(String name, String password) {
     // Make sure to replace with your correct API URL
     return http.post(
-      Uri.parse('http://192.168.60.176:5000/admin-login'),
+      Uri.parse('http://192.168.1.4:5000/admin-login'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
