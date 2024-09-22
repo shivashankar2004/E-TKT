@@ -3,6 +3,7 @@ import 'package:flutter_frontend/config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_frontend/config.dart';
 
 class SignupPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();

@@ -1,8 +1,8 @@
-// ignore_for_file: prefer_const_constructors, sort_child_properties_last, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors
-
-import 'dart:convert'; // Added for JSON encoding
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_frontend/config.dart'; // Make sure you have the correct config file
+import 'qr_scan.dart'; // Import QR scanner page
 
 class AdminLoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -76,8 +76,7 @@ class AdminLoginPage extends StatelessWidget {
               _passwordController.text,
             );
 
-            if (response.statusCode == 200) { 
-              // Login success, show success message
+            if (response.statusCode == 200) {
               final responseData = jsonDecode(response.body);
               final successSnackBar = SnackBar(
                 content: Text('Login successful as Admin ${responseData['message']}!'),
@@ -85,12 +84,14 @@ class AdminLoginPage extends StatelessWidget {
               );
               ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
-              // Navigate to the admin dashboard
+              // Navigate to QR Scanner page
               Future.delayed(Duration(seconds: 2), () {
-                Navigator.pushNamed(context, '/admin-dashboard');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => QRScannerPage()),
+                );
               });
             } else {
-              // Handle login failure
               final errorResponse = jsonDecode(response.body);
               final errorSnackBar = SnackBar(
                 content: Text('Failed to login: ${errorResponse['message']}'),
@@ -131,9 +132,8 @@ class AdminLoginPage extends StatelessWidget {
   }
 
   Future<http.Response> _adminLogin(String name, String password) {
-    // Make sure to replace with your correct API URL
     return http.post(
-      Uri.parse('http://192.168.60.176:5000/admin-login'),
+      Uri.parse('${url}admin-login'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },

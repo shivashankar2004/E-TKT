@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/adm_login.dart';
+import 'package:flutter_frontend/currLoc.dart';
 import 'package:flutter_frontend/landingpage.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
+import 'package:flutter_frontend/homepage.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -17,11 +20,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LandingPage(),
+        home: HomePage(),
         routes: {
           '/login': (context) => LoginPage(),
           '/signup': (context) => SignupPage(),
-
+    
           /*'/pref1':(context) => Preference1(),
         '/pref2':(context) => Preference2(),
         '/mainpage':(context) => MainMusicPage(),
