@@ -51,9 +51,9 @@ class _QRScannerPageState extends State<QRScannerPage> {
         children: <Widget>[
           Expanded(
             flex: 4,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
+                child: QRView(
+                  key: qrKey,
+                  onQRViewCreated: _onQRViewCreated,
             ),
           ),
           Expanded(
