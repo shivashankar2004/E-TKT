@@ -5,12 +5,14 @@ import 'package:flutter_frontend/profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatefulWidget {
+class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<UserHomePage> {
   late SharedPreferences prefs;
 
   @override
@@ -103,7 +105,7 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             color: Colors.white, // White Background
             gradient: LinearGradient(
-              colors: [
+              colors: const [
                 Color.fromARGB(255, 255, 255, 255), // Pale Blue
                 Color.fromARGB(255, 247, 247, 247), // Soft Blue
               ],

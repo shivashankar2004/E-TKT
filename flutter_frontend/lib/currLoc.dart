@@ -14,6 +14,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config.dart';
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -26,6 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isSelected = false;
   late SharedPreferences prefs;
   var token;
+  @override
   void initState() {
     super.initState();
     initSharedprefs();
@@ -86,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
                 onPressed: () {
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
+                      MaterialPageRoute(builder: (context) => UserHomePage()));
                 },
                 icon: Icon(
                   Icons.navigate_before_rounded,

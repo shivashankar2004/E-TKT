@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +7,9 @@ import 'config.dart';
 
 class LandingPage extends StatelessWidget {
   final String wlcm = "Welcome to the App"; // Example value
-  final String nxt = "Let's Get Started"; // Example value
+  final String nxt = "Let's Get Started";
+
+  const LandingPage({super.key}); // Example value
 
   @override
   Widget build(BuildContext context) {
