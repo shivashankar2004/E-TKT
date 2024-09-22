@@ -18,7 +18,7 @@ class SignupPage extends StatelessWidget {
           padding: EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
+              colors: const [
                 Color(0xFFcaf0f8), 
                 Color.fromARGB(255, 255, 255, 255),
               ],
@@ -42,7 +42,7 @@ class SignupPage extends StatelessWidget {
 
   Widget _header(BuildContext context) {
     return Column(
-      children: [
+      children: const [
         Text("Create Account",
             style: TextStyle(
               fontSize: 40,
