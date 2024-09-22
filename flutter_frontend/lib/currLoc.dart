@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
                 onPressed: () {
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
+                      MaterialPageRoute(builder: (context) => UserHomePage()));
                 },
                 icon: Icon(
                   Icons.navigate_before_rounded,

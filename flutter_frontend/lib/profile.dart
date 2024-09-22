@@ -105,7 +105,7 @@ class _ProfilePage extends State<ProfilePage> {
             icon: Icon(Icons.navigate_before_rounded, color: Colors.white),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => UserHomePage()));
             }, // Logout action
           ),
         ],

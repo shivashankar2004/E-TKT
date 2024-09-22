@@ -5,14 +5,14 @@ import 'package:flutter_frontend/profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<UserHomePage> {
   late SharedPreferences prefs;
 
   @override

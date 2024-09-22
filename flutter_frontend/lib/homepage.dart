@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/adm_login.dart';
+import 'package:flutter_frontend/landingpage.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,11 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/adm_login'); // Admin route
+                        Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AdminLoginPage()));  // Admin route
                       },
                       child: Text(
                         'Admin',
@@ -62,7 +68,11 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/landingpage'); // Customer route
+                          Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              LandingPage())); // Customer route
                       },
                       child: Text(
                         'Customer',
