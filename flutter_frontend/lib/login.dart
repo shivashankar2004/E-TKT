@@ -1,13 +1,15 @@
 import 'dart:convert'; // Added for JSON encoding
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/config.dart';
-import 'package:flutter_frontend/currLoc.dart'; // Assuming this is where MyHomePage is located
+// Assuming this is where MyHomePage is located
 import 'package:flutter_frontend/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -35,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
+              colors: const [
                 Color(0xFFcaf0f8), // Pale Blue
                 Color.fromARGB(255, 255, 255, 255), // Soft Blue
               ],

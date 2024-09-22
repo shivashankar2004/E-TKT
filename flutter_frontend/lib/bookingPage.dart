@@ -8,6 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class BookingPage extends StatefulWidget {
+  const BookingPage({super.key});
+
+  @override
   _MyBookingPage createState() => _MyBookingPage();
 }
 
@@ -46,7 +49,7 @@ class _MyBookingPage extends State<BookingPage> {
 
     if (res.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Booking confirmed for ${name}!')),
+        SnackBar(content: Text('Booking confirmed for $name!')),
       );
     }
     else{
@@ -87,7 +90,7 @@ class _MyBookingPage extends State<BookingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'The Cost for is travelling from ${loc1} to ${loc2} is ${cost}',
+              'The Cost for is travelling from $loc1 to $loc2 is $cost',
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),

@@ -16,3 +16,17 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    
+    // Add repositories block here so Gradle knows where to fetch dependencies
+    repositories {
+        google()        // This is necessary to fetch Android dependencies
+        mavenCentral()  // This is necessary to fetch Kotlin and other external libraries
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}

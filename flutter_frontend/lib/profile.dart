@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_frontend/config.dart'; // Assuming this holds the URL configurations
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePage createState() => _ProfilePage();
 }
@@ -117,7 +119,7 @@ class _ProfilePage extends State<ProfilePage> {
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
+            colors: const [
               Color.fromARGB(255, 255, 255, 255), // Pale Blue Background
               Color.fromARGB(255, 255, 255, 255), // Soft Blue Gradient
             ],

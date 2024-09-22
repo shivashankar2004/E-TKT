@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -103,7 +105,7 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             color: Colors.white, // White Background
             gradient: LinearGradient(
-              colors: [
+              colors: const [
                 Color.fromARGB(255, 255, 255, 255), // Pale Blue
                 Color.fromARGB(255, 247, 247, 247), // Soft Blue
               ],
