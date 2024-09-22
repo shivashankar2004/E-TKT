@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_frontend/config.dart';
 
 class SignupPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -132,7 +133,7 @@ class SignupPage extends StatelessWidget {
 
   Future<http.Response> _registerUser(String name, String password) {
     return http.post(
-      Uri.parse('http://192.168.1.4:5000/register'),
+      Uri.parse('${url}register'),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(<String, dynamic>{
         'name': name,

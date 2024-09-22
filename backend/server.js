@@ -262,3 +262,23 @@ app.post('/ticket', async (req, res) => {
     }
 });
 
+app.get('/check_ticket/:qrData', async (req, res) => {
+    try {
+        const { qrData } = req.params;
+        
+        const user = await User.findOne({ name: qrData });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.ticket && Object.keys(user.ticket).length > 0) {
+            return res.status(200).json({ message: 'Ticket found', ticket: user.ticket });
+        } else {
+            return res.status(404).json({ message: 'Ticket not found for this user' });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'An error occurred', error: error.message });
+    }
+});
+
