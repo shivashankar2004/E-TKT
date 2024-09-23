@@ -94,9 +94,11 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(18),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
+            fillColor:
+                Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
             filled: true,
-            prefixIcon: Icon(Icons.person, color: Color(0xFF0077b6)), // Deep Blue Icon
+            prefixIcon:
+                Icon(Icons.person, color: Color(0xFF0077b6)), // Deep Blue Icon
           ),
         ),
         const SizedBox(height: 10),
@@ -108,9 +110,11 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(18),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
+            fillColor:
+                Color(0xFFcaf0f8), // Pale Blue Background for Input Fields
             filled: true,
-            prefixIcon: Icon(Icons.lock, color: Color(0xFF0077b6)), // Deep Blue Icon
+            prefixIcon:
+                Icon(Icons.lock, color: Color(0xFF0077b6)), // Deep Blue Icon
           ),
           obscureText: true,
         ),
@@ -124,7 +128,8 @@ class _LoginPageState extends State<LoginPage> {
           },
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(), backgroundColor: Color(0xFF03045e),
-            padding: const EdgeInsets.symmetric(vertical: 16), // Dark Navy Button Background
+            padding: const EdgeInsets.symmetric(
+                vertical: 16), // Dark Navy Button Background
           ),
           child: Text(
             "Login",
@@ -208,8 +213,7 @@ class _LoginPageState extends State<LoginPage> {
         // Navigate to the next page with the token
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => UserHomePage()),
         );
       } else {
         final errorSnackBar = SnackBar(

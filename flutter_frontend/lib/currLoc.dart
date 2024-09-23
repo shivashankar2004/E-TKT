@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/bookingPage.dart';
+import 'package:flutter_frontend/config.dart';
 import 'package:flutter_frontend/home.dart';
 import 'package:flutter_frontend/locationdata.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,8 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// ignore: duplicate_import
-import 'config.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -29,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isSelected = false;
   late SharedPreferences prefs;
   var token;
+
   @override
   void initState() {
     super.initState();
@@ -48,151 +48,184 @@ class _MyHomePageState extends State<MyHomePage> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled, show an error
       return Future.error('Location services are disabled.');
     }
 
-    // Check for location permissions
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, show an error
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, show an error
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    // When permissions are granted, get the current position
     return await Geolocator.getCurrentPosition();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text(
-            'Fetch Your Loaction',
-            style:
-                GoogleFonts.roboto(fontSize: 24, fontStyle: FontStyle.normal),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF03045E), // Dark Blue
+        title: Text(
+          'Fetch Your Location',
+          style: GoogleFonts.roboto(
+            fontSize: 24,
+            color: Colors.white, // Text color
+            fontStyle: FontStyle.normal,
           ),
-          elevation: 15.0,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => UserHomePage()));
-                },
-                icon: Icon(
-                  Icons.navigate_before_rounded,
-                  size: 35,
-                  color: Color.fromARGB(255, 95, 33, 230),
-                ))
-          ],
         ),
-        body: Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Hello ',
-                        style: GoogleFonts.roboto(
-                            fontSize: 24, color: Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                      TextSpan(
-                          text: '$name!',
-                          style: GoogleFonts.robotoMono(
-                              fontSize: 24,
-                              color: Color.fromARGB(255, 95, 33, 230))),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                if (!isClicked)
-                  ElevatedButton(
-                    onPressed: _handleLocationRequest,
-                    child: Text('Click Me'),
-                  ),
-                SizedBox(height: 5),
-                if (upcomingStops.isNotEmpty) ...[
-                  Text('Select any of the Stops',
-                      style: GoogleFonts.robotoFlex(
-                          fontSize: 22, color: Colors.black)),
-                  SizedBox(height: 12),
-                  SizedBox(
-                    height: 7 * 56.0,
-                    // Assuming each ListTile is 56.0 height
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: upcomingStops.length,
-                      itemBuilder: (context, index) {
-                        String stopName = upcomingStops[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey, // Border color
-                              width: 1.0, // Border width
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                            color: selectedStop == stopName
-                                ? Color.fromARGB(0, 102, 218, 226)
-                                    .withOpacity(0.5)
-                                : null, // Rounded corners
-                          ),
-                          margin: EdgeInsets.symmetric(
-                              vertical: 4.0,
-                              horizontal: 8.0), // Spacing around each item
-                          child: ListTile(
-                            title: Text(
-                              '• $stopName',
-                              style: GoogleFonts.roboto(
-                                fontSize: 19,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            onTap: () => _onStopTap(stopName),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  SizedBox(height: 30), // Space above the button
-                  if (isClicked)
-                    ElevatedButton(
-                      onPressed: _clickBook,
-                      child: Text('Proceed to payment'),
-                    ),
-                ],
-              ],
+        elevation: 15.0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => UserHomePage()),
+              );
+            },
+            icon: Icon(
+              Icons.navigate_before_rounded,
+              size: 35,
+              color: Color(0xFF90E0EF), // Pale Blue
             ),
           ),
-        ));
+        ],
+      ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 12.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Hello ',
+                      style: GoogleFonts.roboto(
+                        fontSize: 24,
+                        color: Color(0xFF03045E), // Dark Blue
+                      ),
+                    ),
+                    TextSpan(
+                      text: '$name!',
+                      style: GoogleFonts.robotoMono(
+                        fontSize: 24,
+                        color: Color(0xFF00B4D8), // Light Blue
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              if (!isClicked)
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF0077B6), // Medium Blue
+                    padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    elevation: 10,
+                  ),
+                  onPressed: _handleLocationRequest,
+                  child: Text(
+                    'Click Me',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              SizedBox(height: 5),
+              if (upcomingStops.isNotEmpty) ...[
+                Text(
+                  'Select any of the Stops',
+                  style: GoogleFonts.robotoFlex(
+                    fontSize: 22,
+                    color: Color(0xFF03045E), // Dark Blue
+                  ),
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  height: 7 * 56.0, // Assuming each ListTile is 56.0 height
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: upcomingStops.length,
+                    itemBuilder: (context, index) {
+                      String stopName = upcomingStops[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xFF0077B6), // Medium Blue Border
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: selectedStop == stopName
+                              ? Color(0xFF00B4D8).withOpacity(0.5) // Light Blue if selected
+                              : Colors.white, // Default color
+                        ),
+                        margin: EdgeInsets.symmetric(
+                          vertical: 4.0,
+                          horizontal: 8.0,
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            '• $stopName',
+                            style: GoogleFonts.roboto(
+                              fontSize: 19,
+                              color: Color(0xFF03045E), // Dark Blue text
+                            ),
+                          ),
+                          onTap: () => _onStopTap(stopName),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 30),
+                if (isClicked)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0077B6), // Medium Blue
+                      padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      elevation: 10,
+                    ),
+                    onPressed: _clickBook,
+                    child: Text(
+                      'Proceed to payment',
+                      style: GoogleFonts.roboto(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _handleLocationRequest() async {
     try {
       Position position = await _getCurrentLocation();
-      // Use the latitude and longitude here
 
       List<String> fetchedstops = fetch(position.longitude);
-
       String currPosition = curr(position.longitude);
 
       setState(() {
@@ -200,12 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
         StopeOne = currPosition;
         isClicked = true;
       });
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //   content: Text(
-      //       'Latitude: ${position.latitude}, Longitude: ${position.longitude}'),
-      // ));
     } catch (e) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error: $e'),
       ));
@@ -225,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please Select Your Destinaion"),
+          content: Text("Please Select Your Destination"),
           backgroundColor: Colors.red,
         ),
       );
@@ -233,15 +261,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _sendLoc(String? loc1, String? loc2) async {
-    var res = await http.post(Uri.parse('http://192.168.203.159:5555/test'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'name': name,
-          'location1': loc1,
-          'location2': loc2
-        }));
+    var res = await http.post(
+      Uri.parse('${url}test'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'name': name,
+        'location1': loc1,
+        'location2': loc2,
+      }),
+    );
 
     if (res.statusCode == 200) {
       var jsonres = jsonDecode(res.body);
