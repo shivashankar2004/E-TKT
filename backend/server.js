@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -19,12 +21,12 @@ const JWT_SECRET = "spd";
 
 
 
-const port = 5555;
+const port = process.env.PORT;
 
 
 const database = async () => {
     try {
-        await mongoose.connect('mongodb+srv://SHIVA:hLdisadAM451XElF@cluster0.zlhka20.mongodb.net/eticket?retryWrites=true&w=majority&appName=Cluster0');
+        await mongoose.connect(process.env.MONGO_URL)
         console.log("Connected to Cloud");
         app.listen(port,() => {
             console.log('Server is listening on port '+port);
