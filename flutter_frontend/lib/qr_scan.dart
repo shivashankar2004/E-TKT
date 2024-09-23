@@ -1,7 +1,6 @@
-import 'dart:convert';
+import 'dart:convert'; // For decoding JSON data
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:http/http.dart' as http;
 
 class QRScannerPage extends StatefulWidget {
   @override
@@ -11,57 +10,22 @@ class QRScannerPage extends StatefulWidget {
 class _QRScannerPageState extends State<QRScannerPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
-  String ticketStatus = 'Scan a QR code to verify the ticket';
+  String ticketStatus = 'Scan a QR code to view the data';
+  Map<String, dynamic>? qrData; // To hold the decoded JSON data
 
-  /// Function to extract the ticket from QR data
-  String? extractTicket(String? qrData) {
-    if (qrData == null || qrData.isEmpty) {
-      print('QR data is null or empty');
-      return null; // Return null if data is invalid
-    }
-
+  // Function to process and display QR code JSON data
+  void handleScannedQRData(String rawQrData) {
     try {
-      // Assuming the QR data is a JSON string that contains a 'ticket' field
-      var decodedData = jsonDecode(qrData);
-      print('Decoded QR data: $decodedData');
-
-      if (decodedData is Map && decodedData.containsKey('ticket')) {
-        return decodedData['ticket']; // Return the ticket data
-      } else {
-        print('Ticket not found in QR data');
-        return null;
-      }
-    } catch (e) {
-      print('Error decoding QR data: $e');
-      return null;
-    }
-  }
-
-  /// Verify the ticket using the extracted ticket data
-  Future<void> verifyTicket(String ticket) async {
-    final url = Uri.parse('http://192.168.203.159:5555/check_ticket/$ticket');
-
-    try {
-      final response = await http.get(url);
-      print('Server response status: ${response.statusCode}');
-      print('Server response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        setState(() {
-          ticketStatus = 'Ticket found: ${response.body}';
-        });
-      } else if (response.statusCode == 404) {
-        setState(() {
-          ticketStatus = 'Ticket not found';
-        });
-      } else {
-        setState(() {
-          ticketStatus = 'Error: ${response.statusCode}';
-        });
-      }
+      // Decode the JSON string
+      final decodedJson = jsonDecode(rawQrData);
+      
+      setState(() {
+        qrData = decodedJson; // Store the decoded JSON data
+        ticketStatus = 'QR code scanned successfully!'; // Update the status message
+      });
     } catch (e) {
       setState(() {
-        ticketStatus = 'Error occurred: $e';
+        ticketStatus = 'Invalid QR code or JSON data!'; // Error if decoding fails
       });
     }
   }
@@ -70,7 +34,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Ticket Scanner'),
+        title: Text('QR JSON Scanner'),
       ),
       body: Column(
         children: <Widget>[
@@ -84,7 +48,17 @@ class _QRScannerPageState extends State<QRScannerPage> {
           Expanded(
             flex: 1,
             child: Center(
-              child: Text(ticketStatus),
+              child: qrData != null
+                  ? ListView(
+                      padding: EdgeInsets.all(10),
+                      children: qrData!.entries.map((entry) {
+                        return ListTile(
+                          title: Text('${entry.key}'),
+                          subtitle: Text('${entry.value}'),
+                        );
+                      }).toList(),
+                    )
+                  : Text(ticketStatus), // Show the status or error
             ),
           )
         ],
@@ -95,23 +69,11 @@ class _QRScannerPageState extends State<QRScannerPage> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      final qrData = scanData.code;
+      final rawQrData = scanData.code;
 
-      // Debugging: Print the raw QR data to the console
-      print('Scanned QR data: $qrData');
-
-      // Extract ticket from the scanned QR data
-      final ticket = extractTicket(qrData);
-
-      if (ticket != null) {
-        print('Extracted ticket: $ticket');
-        // Verify ticket using the extracted ticket data
-        verifyTicket(ticket);
-        controller.pauseCamera(); // Pause the camera after scanning
-      } else {
-        setState(() {
-          ticketStatus = 'Invalid QR code data';
-        });
+      if (rawQrData != null) {
+        handleScannedQRData(rawQrData); // Handle the scanned QR data as JSON
+        controller.pauseCamera(); // Pause the camera after scanning to prevent multiple scans
       }
     });
   }
