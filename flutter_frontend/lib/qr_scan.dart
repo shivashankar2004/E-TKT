@@ -12,17 +12,40 @@ class _QRScannerPageState extends State<QRScannerPage> {
   QRViewController? controller;
   String ticketStatus = 'Scan a QR code to view the data';
   Map<String, dynamic>? qrData; // To hold the decoded JSON data
+  Duration allowedInterval = Duration(minutes: 20); // 20-minute window
+
+  // Function to validate if the ticket timestamp is within the allowed interval
+  bool isTicketValid(String issueDate) {
+    try {
+      DateTime ticketTime = DateTime.parse(issueDate); // Parse the issueDate from the QR code
+      DateTime currentTime = DateTime.now();
+
+      Duration difference = currentTime.difference(ticketTime).abs(); // Get the absolute difference
+
+      // Check if the difference is within the allowed 20-minute window
+      return difference <= allowedInterval;
+    } catch (e) {
+      return false; // Return false if there's an error in parsing the timestamp
+    }
+  }
 
   // Function to process and display QR code JSON data
   void handleScannedQRData(String rawQrData) {
     try {
       // Decode the JSON string
       final decodedJson = jsonDecode(rawQrData);
-      
-      setState(() {
-        qrData = decodedJson; // Store the decoded JSON data
-        ticketStatus = 'QR code scanned successfully!'; // Update the status message
-      });
+
+      // Check if the JSON has an 'issueDate' and validate it
+      if (decodedJson.containsKey('issueDate') && isTicketValid(decodedJson['issueDate'])) {
+        setState(() {
+          qrData = decodedJson; // Store the decoded JSON data
+          ticketStatus = 'Valid ticket. QR code scanned successfully!'; // Update the status message
+        });
+      } else {
+        setState(() {
+          ticketStatus = 'Invalid or expired ticket!'; // Error if timestamp is invalid or expired
+        });
+      }
     } catch (e) {
       setState(() {
         ticketStatus = 'Invalid QR code or JSON data!'; // Error if decoding fails
