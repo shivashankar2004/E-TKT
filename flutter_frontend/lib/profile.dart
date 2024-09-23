@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/currLoc.dart';
 import 'package:flutter_frontend/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -219,7 +220,10 @@ class _ProfilePage extends State<ProfilePage> {
                         elevation: 5.0,
                       ),
                       onPressed: () {
-                        // Action for booking tickets
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MyHomePage()));
                       },
                       child: Text(
                         "Book Ticket Now",

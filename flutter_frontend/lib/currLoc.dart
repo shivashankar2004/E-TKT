@@ -19,7 +19,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+ class _MyHomePageState extends State<MyHomePage> {
   late String name;
   List<String> upcomingStops = [];
   String? selectedStop;
