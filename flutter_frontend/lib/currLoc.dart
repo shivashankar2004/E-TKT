@@ -233,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _sendLoc(String? loc1, String? loc2) async {
-    var res = await http.post(Uri.parse('http://192.168.1.4:5555/test'),
+    var res = await http.post(Uri.parse('http://192.168.203.159:5555/test'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
