@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/adm_login.dart';
-import 'package:flutter_frontend/currLoc.dart';
-import 'package:flutter_frontend/landingpage.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:flutter_frontend/signup.dart';
 import 'package:flutter_frontend/homepage.dart';
