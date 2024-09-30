@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_frontend/login.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts package
 import 'package:flutter_frontend/adm_login.dart';
-import 'package:flutter_frontend/landingpage.dart';
 
 class HomePage extends StatelessWidget {
   @override
