@@ -1,3 +1,4 @@
+import 'dart:convert'; // For decoding JSON data
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:http/http.dart' as http;
@@ -11,30 +12,45 @@ class QRScannerPage extends StatefulWidget {
 class _QRScannerPageState extends State<QRScannerPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
-  String ticketStatus = 'Scan a QR code to verify the ticket';
+  String ticketStatus = 'Scan a QR code to view the data';
+  Map<String, dynamic>? qrData; // To hold the decoded JSON data
+  Duration allowedInterval = Duration(minutes: 20); // 20-minute window
 
-  Future<void> verifyTicket(String qrData) async {
-    final url = Uri.parse('http://192.168.1.4:5555/check_ticket/$qrData');
-
+  // Function to validate if the ticket timestamp is within the allowed interval
+  bool isTicketValid(String issueDate) {
     try {
-      final response = await http.get(url);
+      DateTime ticketTime = DateTime.parse(issueDate); // Parse the issueDate from the QR code
+      DateTime currentTime = DateTime.now();
 
-      if (response.statusCode == 200) {
+      Duration difference = currentTime.difference(ticketTime).abs(); // Get the absolute difference
+
+      // Check if the difference is within the allowed 20-minute window
+      return difference <= allowedInterval;
+    } catch (e) {
+      return false; // Return false if there's an error in parsing the timestamp
+    }
+  }
+
+  // Function to process and display QR code JSON data
+  void handleScannedQRData(String rawQrData) {
+    try {
+      // Decode the JSON string
+      final decodedJson = jsonDecode(rawQrData);
+
+      // Check if the JSON has an 'issueDate' and validate it
+      if (decodedJson.containsKey('issueDate') && isTicketValid(decodedJson['issueDate'])) {
         setState(() {
-          ticketStatus = 'Ticket found: ${response.body}';
-        });
-      } else if (response.statusCode == 404) {
-        setState(() {
-          ticketStatus = 'Ticket not found';
+          qrData = decodedJson; // Store the decoded JSON data
+          ticketStatus = 'Valid ticket. QR code scanned successfully!'; // Update the status message
         });
       } else {
         setState(() {
-          ticketStatus = 'Error: ${response.statusCode}';
+          ticketStatus = 'Invalid or expired ticket!'; // Error if timestamp is invalid or expired
         });
       }
     } catch (e) {
       setState(() {
-        ticketStatus = 'Error occurred: $e';
+        ticketStatus = 'Invalid QR code or JSON data!'; // Error if decoding fails
       });
     }
   }
@@ -43,7 +59,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Ticket Scanner'),
+        title: Text('QR JSON Scanner'),
       ),
       body: Column(
         children: <Widget>[
@@ -57,7 +73,17 @@ class _QRScannerPageState extends State<QRScannerPage> {
           Expanded(
             flex: 1,
             child: Center(
-              child: Text(ticketStatus),
+              child: qrData != null
+                  ? ListView(
+                      padding: EdgeInsets.all(10),
+                      children: qrData!.entries.map((entry) {
+                        return ListTile(
+                          title: Text('${entry.key}'),
+                          subtitle: Text('${entry.value}'),
+                        );
+                      }).toList(),
+                    )
+                  : Text(ticketStatus), // Show the status or error
             ),
           )
         ],
@@ -68,11 +94,12 @@ class _QRScannerPageState extends State<QRScannerPage> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      final qrData = scanData.code;
+      final rawQrData = scanData.code;
 
-      verifyTicket(qrData!);
-
-      controller.pauseCamera();
+      if (rawQrData != null) {
+        handleScannedQRData(rawQrData); // Handle the scanned QR data as JSON
+        controller.pauseCamera(); // Pause the camera after scanning to prevent multiple scans
+      }
     });
   }
 
