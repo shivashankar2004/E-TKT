@@ -79,7 +79,8 @@ class AdminLoginPage extends StatelessWidget {
             if (response.statusCode == 200) {
               final responseData = jsonDecode(response.body);
               final successSnackBar = SnackBar(
-                content: Text('Login successful as Admin ${responseData['message']}!'),
+                content: Text(
+                    'Login successful as Admin ${responseData['message']}!'),
                 backgroundColor: Colors.green,
               );
               ScaffoldMessenger.of(context).showSnackBar(successSnackBar);

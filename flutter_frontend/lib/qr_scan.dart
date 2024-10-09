@@ -1,6 +1,7 @@
 import 'dart:convert'; // For decoding JSON data
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'ticket_success_page.dart'; 
 
 class QRScannerPage extends StatefulWidget {
   @override
@@ -12,22 +13,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
   QRViewController? controller;
   String ticketStatus = 'Scan a QR code to view the data';
   Map<String, dynamic>? qrData; // To hold the decoded JSON data
-  Duration allowedInterval = Duration(minutes: 20); // 20-minute window
-
-  // Function to validate if the ticket timestamp is within the allowed interval
-  bool isTicketValid(String issueDate) {
-    try {
-      DateTime ticketTime = DateTime.parse(issueDate); // Parse the issueDate from the QR code
-      DateTime currentTime = DateTime.now();
-
-      Duration difference = currentTime.difference(ticketTime).abs(); // Get the absolute difference
-
-      // Check if the difference is within the allowed 20-minute window
-      return difference <= allowedInterval;
-    } catch (e) {
-      return false; // Return false if there's an error in parsing the timestamp
-    }
-  }
 
   // Function to process and display QR code JSON data
   void handleScannedQRData(String rawQrData) {
@@ -35,22 +20,35 @@ class _QRScannerPageState extends State<QRScannerPage> {
       // Decode the JSON string
       final decodedJson = jsonDecode(rawQrData);
 
-      // Check if the JSON has an 'issueDate' and validate it
-      if (decodedJson.containsKey('issueDate') && isTicketValid(decodedJson['issueDate'])) {
         setState(() {
           qrData = decodedJson; // Store the decoded JSON data
-          ticketStatus = 'Valid ticket. QR code scanned successfully!'; // Update the status message
+        ticketStatus = 'QR code scanned successfully!'; // Update the status message
         });
-      } else {
-        setState(() {
-          ticketStatus = 'Invalid or expired ticket!'; // Error if timestamp is invalid or expired
-        });
-      }
+
+      // Navigate to success page after decoding and verifying the ticket
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TicketSuccessPage(ticketData: decodedJson), // Pass the ticket data
+        ),
+      ).then((_) {
+        // When returning from the success page, reset the scanner
+        _resetScanner();
+      });
     } catch (e) {
       setState(() {
         ticketStatus = 'Invalid QR code or JSON data!'; // Error if decoding fails
       });
     }
+  }
+
+  // Function to reset the scanner for the next ticket scan
+  void _resetScanner() {
+    setState(() {
+      ticketStatus = 'Scan a QR code to view the data'; // Reset the status
+      qrData = null; // Clear the previous data
+    });
+    controller?.resumeCamera(); // Resume the camera for the next scan
   }
 
   @override
