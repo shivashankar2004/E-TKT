@@ -20,10 +20,10 @@ class _QRScannerPageState extends State<QRScannerPage> {
       // Decode the JSON string
       final decodedJson = jsonDecode(rawQrData);
 
-      setState(() {
-        qrData = decodedJson; // Store the decoded JSON data
+        setState(() {
+          qrData = decodedJson; // Store the decoded JSON data
         ticketStatus = 'QR code scanned successfully!'; // Update the status message
-      });
+        });
 
       // Navigate to success page after decoding and verifying the ticket
       Navigator.push(
