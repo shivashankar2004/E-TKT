@@ -264,16 +264,52 @@ app.post('/ticket', async (req, res) => {
     }
 });
 
+// app.get('/check_ticket/:qrData', async (req, res) => {
+//     try {
+//         const { qrData } = req.params;
+        
+//         const user = await User.findOne({ name: qrData });
+        
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         if (user.ticket && Object.keys(user.ticket).length > 0) {
+//             return res.status(200).json({ message: 'Ticket found', ticket: user.ticket });
+//         } else {
+//             return res.status(404).json({ message: 'Ticket not found for this user' });
+//         }
+//     } catch (error) {
+//         return res.status(500).json({ message: 'An error occurred', error: error.message });
+//     }
+// });
+
 app.get('/check_ticket/:qrData', async (req, res) => {
     try {
         const { qrData } = req.params;
-        
-        const user = await User.findOne({ name: qrData });
-        
+
+        // Attempt to parse qrData as JSON, if it fails assume qrData is a plain string (user name)
+        let decodedData;
+        try {
+            decodedData = JSON.parse(qrData);
+        } catch (e) {
+            decodedData = { name: qrData }; // Assume qrData is just the user's name
+        }
+
+        // Check if the decoded data contains the 'name' field
+        const userName = decodedData.name;
+        if (!userName) {
+            return res.status(400).json({ message: 'Invalid QR data: missing name' });
+        }
+
+        // Find the user based on the name field
+        const user = await User.findOne({ name: userName });
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Check if the user has a ticket
         if (user.ticket && Object.keys(user.ticket).length > 0) {
             return res.status(200).json({ message: 'Ticket found', ticket: user.ticket });
         } else {
