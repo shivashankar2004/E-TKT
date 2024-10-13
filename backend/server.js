@@ -56,7 +56,7 @@ database();
 
 // User Registration Route
 app.post('/register', async (req, res) => {
-    try {
+    try {                       
         const { name, password, ticket } = req.body;
         const existingUser = await User.findOne({ name });
         if (existingUser) {
